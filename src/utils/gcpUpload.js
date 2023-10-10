@@ -8,6 +8,9 @@ import multer from "multer";
 import sharp from "sharp";
 const { Storage } = require("@google-cloud/storage");
 const bucketName = process.env.BUCKET_NAME;
+
+import ExifParser from "exif-parser";
+
 let imgTransforms = [
   {
     name: "image",
@@ -32,14 +35,12 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 export default async function gcpUpload(req, res) {
   try {
-    //   console.log("req", req);
+    // Read the uploaded image data from req.files.photos
     let file = req.files.photos;
-    console.log("file name is ", file.name);
 
     let isMulti = req.body.isMulti;
     let uploadPath = req.body.uploadPath;
     let uploadName = file.name;
-    //   console.log("file ", file);
 
     const currentTime = Date.now();
     if (!file) {
@@ -47,15 +48,7 @@ export default async function gcpUpload(req, res) {
       return;
     }
 
-    // const storageObject = new Storage({
-    //   keyFilename: path.join(
-    //     __dirname,
-    //     "../",
-    //     "configs",
-    //     "key-file-from-service-account.json"
-    //   ),
-    // });
-
+    // Create a Google Cloud Storage object
     const storageObject = new Storage({
       keyFilename: path.join(__dirname, "../", "specific_env_variables.json"),
     });
@@ -67,10 +60,37 @@ export default async function gcpUpload(req, res) {
     let availableSizes = {};
     let uploads = [];
 
+    // Parse the EXIF data from the image buffer
+    const exifParser = ExifParser.create(file.data);
+    const exifResult = exifParser.parse();
+    const orientation = exifResult.tags.Orientation;
+
+    console.log("exifResult is ", exifResult);
+
+    console.log("orientation is ", orientation);
+
+    let rotationAngle = 0;
+
+    switch (orientation) {
+      case 6:
+        rotationAngle = 90; // Rotate 90 degrees clockwise
+        break;
+      case 8:
+        rotationAngle = -90; // Rotate 90 degrees counterclockwise
+        break;
+      // Add cases for other orientation values if needed
+    }
+
     for (let i = 0; i < 4; i++) {
       let name = imgTransforms[i].name;
       let { size, fit, format, type } = imgTransforms[i].transform;
-      const resizedImage = await sharp(file.data)
+      let imageBuffer = file.data;
+
+      if (rotationAngle !== 0) {
+        imageBuffer = await sharp(imageBuffer).rotate(rotationAngle).toBuffer();
+      }
+
+      const resizedImage = await sharp(imageBuffer)
         .resize({
           height: size,
           fit: sharp.fit[fit],
@@ -78,13 +98,11 @@ export default async function gcpUpload(req, res) {
         })
         .webp({ lossless: true, alphaQuality: 50, quality: 80 })
         .toBuffer();
-      // console.log("name ", `${req.body.uploadPath}${name}-${file.name}`);
+
       const fileURI = `${uploadPath}${name}-${currentTime}-${
         uploadName.split(".")[0]
       }.webp`;
       const blob = bucket.file(fileURI);
-
-      console.log("blob created is ", blob);
 
       const blobStream = blob.createWriteStream({
         metadata: {
@@ -133,5 +151,8 @@ export default async function gcpUpload(req, res) {
     });
   } catch (err) {
     console.log("gcp upload error is ", err);
+    res.status(500).json({
+      error: err,
+    });
   }
 }

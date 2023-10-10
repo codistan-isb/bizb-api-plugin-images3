@@ -20,11 +20,11 @@ const imgTransforms = [
   },
   {
     name: "medium",
-    transform: { size: 600, fit: "inside", format: "jpg", type: "image/jpeg" },
+    transform: { size: 600, fit: "inside", format: "jpg", type: "image/jpeg",  quality: 100 },
   },
   {
     name: "thumbnail",
-    transform: { size: 235, fit: "inside", format: "png", type: "image/png" },
+    transform: { size: 235, fit: "inside", format: "png", type: "image/png", quality: 100 },
   },
 ];
 
