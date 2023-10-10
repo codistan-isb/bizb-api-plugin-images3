@@ -86,11 +86,12 @@ export default async function gcpUpload(req, res) {
       let { size, fit, format, type } = imgTransforms[i].transform;
       let imageBuffer = file.data;
 
-      if (rotationAngle !== 0) {
-        imageBuffer = await sharp(imageBuffer).rotate(rotationAngle).toBuffer();
-      }
+      // if (rotationAngle !== 0) {
+      //   imageBuffer = await sharp(imageBuffer).rotate(rotationAngle).toBuffer();
+      // }
 
       const resizedImage = await sharp(imageBuffer)
+        .rotate()
         .resize({
           height: size,
           fit: sharp.fit[fit],
