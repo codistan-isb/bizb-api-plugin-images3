@@ -19,9 +19,9 @@ input ImageInfoInput {
   variantId: ID
 }
 input ImageSizesInput {
-  large: String!
-  medium: String!
-  original: String!
-  small: String!
-  thumbnail: String!
+  large: String
+  medium: String
+  original: String
+  small: String
+  thumbnail: String
 }
