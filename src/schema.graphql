@@ -1,9 +1,9 @@
 extend input ProductInput {
-  media: [ImageInfoInput]
+  media: [ImageInfoInput]!
   mediaS3: [ImageInfoInput]
 }
 extend input ProductVariantInput {
-  media: [ImageInfoInput]
+  media: [ImageInfoInput]!
   mediaS3: [ImageInfoInput]
 }
  
@@ -12,7 +12,7 @@ extend type Product {
 }
 
 input ImageInfoInput {
-  URLs: ImageSizesInput
+  URLs: ImageSizesInput!
   priority: Int
   _id: ID
   productId: ID
