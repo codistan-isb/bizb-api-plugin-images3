@@ -61,25 +61,25 @@ export default async function gcpUpload(req, res) {
     let uploads = [];
 
     // Parse the EXIF data from the image buffer
-    const exifParser = ExifParser.create(file.data);
-    const exifResult = exifParser.parse();
-    const orientation = exifResult.tags.Orientation;
+    // const exifParser = ExifParser.create(file.data);
+    // const exifResult = exifParser.parse();
+    // const orientation = exifResult.tags.Orientation;
 
-    console.log("exifResult is ", exifResult);
+    // console.log("exifResult is ", exifResult);
 
-    console.log("orientation is ", orientation);
+    // console.log("orientation is ", orientation);
 
     let rotationAngle = 0;
 
-    switch (orientation) {
-      case 6:
-        rotationAngle = 90; // Rotate 90 degrees clockwise
-        break;
-      case 8:
-        rotationAngle = -90; // Rotate 90 degrees counterclockwise
-        break;
-      // Add cases for other orientation values if needed
-    }
+    // switch (orientation) {
+    //   case 6:
+    //     rotationAngle = 90; // Rotate 90 degrees clockwise
+    //     break;
+    //   case 8:
+    //     rotationAngle = -90; // Rotate 90 degrees counterclockwise
+    //     break;
+    //   // Add cases for other orientation values if needed
+    // }
 
     for (let i = 0; i < 4; i++) {
       let name = imgTransforms[i].name;
