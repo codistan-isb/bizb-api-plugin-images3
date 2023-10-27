@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 import morgan from "morgan";
 import _ from "lodash";
 import gcpUpload from "./utils/gcpUpload.js";
+import gcpDelete from "./utils/gcpDelete.js";
 import { S3UploadImage, S3UploadDocument } from "./utils/s3Upload.js";
 import sharp from "sharp";
 import { createGCPConfig } from "./startup.js";
@@ -146,6 +147,22 @@ function myStartup1(context) {
         res.status(500).send(err);
       }
     });
+    app.expressApp.delete("/delete", async (req, res) => {
+      console.log("req.body", req.files);
+      let fileName = req.files.fileName;
+      console.log("fileName", fileName.name);
+      // if (bucketPlateForm === "GCP") {
+        // console.log("GCP");
+        let imageResponse = await gcpDelete(fileName.name);
+        console.log("imageResponse", imageResponse);
+        res.status(200).json(imageResponse);
+      // } else {
+      //   console.log("S3");
+      //   let imageResponse = await S3Delete(fileName);
+      //   res.status(200).json(imageResponse);
+      // }
+    }
+    );
   }
 
   const ImageSizes = new SimpleSchema({
