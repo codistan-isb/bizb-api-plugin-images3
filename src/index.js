@@ -152,17 +152,25 @@ function myStartup1(context) {
       let fileName = req.files.fileName;
       console.log("fileName", fileName.name);
       // if (bucketPlateForm === "GCP") {
-        // console.log("GCP");
-        let imageResponse = await gcpDelete(fileName.name);
-        console.log("imageResponse", imageResponse);
-        res.status(200).json(imageResponse);
+      // console.log("GCP");
+      let imageResponse = await gcpDelete(fileName.name);
+      console.log("imageResponse", imageResponse);
+      res.status(200).json(imageResponse);
       // } else {
       //   console.log("S3");
       //   let imageResponse = await S3Delete(fileName);
       //   res.status(200).json(imageResponse);
       // }
-    }
-    );
+    });
+    app.expressApp.get("/health-check", async (req, res) => {
+      const timestamp = new Date().toISOString();
+      const statusCode = res.statusCode;
+
+      res.json({
+        timestamp: timestamp,
+        statusCode: statusCode,
+      });
+    });
   }
 
   const ImageSizes = new SimpleSchema({
