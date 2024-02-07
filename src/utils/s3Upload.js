@@ -9,6 +9,8 @@ const s3 = new AWS.S3({
 });
 const promises = [];
 
+const defaultBaseUrl = `https://${process.env.BUCKET_NAME}.s3.${process.env.REGION}.amazonaws.com/`;
+
 const imgTransforms = [
   {
     name: "image",
@@ -20,11 +22,23 @@ const imgTransforms = [
   },
   {
     name: "medium",
-    transform: { size: 600, fit: "inside", format: "jpg", type: "image/jpeg",  quality: 100 },
+    transform: {
+      size: 600,
+      fit: "inside",
+      format: "jpg",
+      type: "image/jpeg",
+      quality: 100,
+    },
   },
   {
     name: "thumbnail",
-    transform: { size: 235, fit: "inside", format: "png", type: "image/png", quality: 100 },
+    transform: {
+      size: 235,
+      fit: "inside",
+      format: "png",
+      type: "image/png",
+      quality: 100,
+    },
   },
 ];
 
@@ -86,9 +100,16 @@ export async function S3UploadImage(
             }.webp`,
             Body: image,
           };
-          const { Location } = await s3.upload(params).promise();
+          let { Location } = await s3.upload(params).promise();
 
-          console.log("location is ", index, Location);
+          if (process.env.AWS_CANONICAL_URL) {
+            Location = Location.replace(
+              defaultBaseUrl,
+              process.env.AWS_CANONICAL_URL
+            );
+          }
+
+          // console.log("location is ", index, Location);
 
           urlsArray.push(Location);
         })

@@ -39,6 +39,7 @@ const specificVariables = [
 ];
 
 function createGCPConfig() {
+  if (process.env.BUCKET_PLATFORM !== "GCP") return;
   const envVariables = {};
 
   specificVariables.forEach((item) => {
